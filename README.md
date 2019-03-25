@@ -1,93 +1,93 @@
-# realtime\_data\_migrate\_to\_hybriddb\_for\_postgresql
+# Realtime data migrate to hybriddb for postgresql
 
-If you want to know how to migrate full data from aws redshift to hybriddn for
+## Summary
+0. [Introduction](#introduction)
+1. [Architecture](#architecture)
+2. [Configure Oss trigger for Function Compute](#configure-oss-trigger-for-function-compute)
+3. [Code Practice](#code-practice)
+4. [Support](#support)
+
+## Introduction
+This document introduces how to use FunctionCompute,PostgreySQL,Java and other skills to migrate data realtime. If you want to know how to migrate full data from aws redshift to hybriddn for
 postgreysql, you can visit this
 [address](https://github.com/alibabacloud-howto/migrate_aws_redshift_to_hybriddb_for_postgresql). Here this docoment will tell you how to migrate realtime data to hybriddb for
 postgreysql.
 
-1 Architecture
-==============
+## Architecture
 
-![](https://common-source.oss-ap-southeast-1.aliyuncs.com/github/4b0a19f9382c8d58916de04068d8ffa7_20181203091841.png)
+![](images/4b0a19f9382c8d58916de04068d8ffa7.png)
 
-1.  You should write your increment data to oss directly, for example, maybe you
+- You should write your increment data to oss directly, for example, maybe you
     have generate some produce data, the save type is csv file. you can write
     these csv files to oss by oss API
 
-2.  Oss will listen to the modify of bucket, and notice function compute to
+- Oss will listen to the modify of bucket, and notice function compute to
     process data.
 
-3.  Function Compute will start to process data, you can use python/nodejs/java
+- Function Compute will start to process data, you can use python/nodejs/java
     or other language to process, here I use java.
 
-2 Configure Oss trigger for Function Compute 
-=============================================
+## Configure Oss Trigger for Function Compute
 
-2.1 Create Oss Bucket
----------------------
-
+### Create Oss Bucket
 Before you follow these steps to create an Object Storage Service (OSS) bucket,
 make sure that you have activated OSS:
 
-(1) Log on to the [OSS console](https://oss.console.aliyun.com/).
+- Log on to the [OSS console](https://oss.console.aliyun.com/).
 
-(2) See *OSS topic* [Create a
+- See *OSS topic* [Create a
     bucket](https://www.alibabacloud.com/help/doc-detail/31885.htm) to create a
     bucket.
-In this sample, we select the China East 2 (Shanghai) region, set the name of the OSS bucket to awesomefc, set <span style="font-weight: bold;">Storage Class</span> to <span style="font-weight: bold;">Standard Storage</span>, and set <span style="font-weight: bold;">ACL</span> to <span style="font-weight: bold;">Private</span>.
+In this sample, we select the China East 2 (Shanghai) region, set the name of the OSS bucket to awesomefc, set **Storage Class** to **Standard Storage** and set **ACL** to **Private**.
 
-(3) click the <span style="font-weight: bold;">Files</span> tab, click <span style="font-weight: bold;">Create Directory</span>, and set the directory name to <span style="font-weight: bold;">source</span>. Click <span style="font-weight: bold;">OK</span>.
+- click the **Files** tab, click **Create Directory**, and set the directory name to **source**. Click **OK**.
 
-(4) In the /source directory, upload an image. In this example, the
+- In the /source directory, upload an image. In this example, the
     serverless.png image is uploaded.
 
-2.2 Create Function
--------------------
+### Create Function
 
-(1) Log on to the [Function Compute console](https://fc.console.aliyun.com/).
+- Log on to the [Function Compute console](https://fc.console.aliyun.com/).
 
-(2) See topic [Service
+- See topic [Service
     operations](https://www.alibabacloud.com/help/doc-detail/73337.htm) to
     create a service.
 
-In this example, we select the China East 2 (Shanghai) region, set the service name to <span style="font-weight: bold;">demo</span>, select the <span style="font-weight: bold;">test-project</span> log project, select the <span style="font-weight: bold;">test-logstore</span> Logstore, role operation to Create new role, and system policies to AliyunOSSFullAccess and AliyunLogFullAccess.
+In this example, we select the China East 2 (Shanghai) region, set the service name to **demo**, select the **test-project** log project, select the **test-logstore** Logstore, role operation to Create new role, and system policies to AliyunOSSFullAccess and AliyunLogFullAccess.
 
-(3) See topic [Function
+- See topic [Function
     operations](https://www.alibabacloud.com/help/doc-detail/73338.htm) to
     create a function.
 
-In this example, we select the <span style="font-weight: bold;">Empty Function</span> template, create no triggers, set the function name to <span style="font-weight: bold;">resize</span>, runtime environment to <span style="font-weight: bold;">Python</span>, and leave other parameters to their default values.
+In this example, we select the **Empty Function** template, create no triggers, set the function name to **resize**, runtime environment to **Python**, and leave other parameters to their default values.
 
-(4) Edit your function code.
+- Edit your function code.
 
-2.3 Create Trigger
-------------------
+### Create Trigger
 
-(1) Log on to the [Function Compute console](https://fc.console.aliyun.com/).
+- Log on to the [Function Compute console](https://fc.console.aliyun.com/).
 
-(2) Click **Triggers** on the code execution page.
+- Click **Triggers** on the code execution page.
 
-(3) Set the trigger type as **Object Storage Service (OSS)**, and select the new
+- Set the trigger type as **Object Storage Service (OSS)**, and select the new
 bucket.
 
-(4) Select oss:objectCreated:\* as the trigger event, and **source/** as the
+- Select oss:objectCreated:\* as the trigger event, and **source/** as the
 prefix.
 
-(5) In Invocation Role Management, select **Select an existing role**. The
+- In Invocation Role Management, select **Select an existing role**. The
 system provides a role named AliyunOSSEventNotificationRole for the OSS trigger,
 and you can select this role directly as the trigger role.
 
 The trigger needs to set a trigger role to authorize the execution of the
 function. OSS needs to play this role to trigger the function. For more
-information on permissions, see [User
-permissions](https://www.alibabacloud.com/help/doc-detail/52885.htm).
+information on permissions, see [User permissions](https://www.alibabacloud.com/help/doc-detail/52885.htm).
 
 After the OSS trigger is set, you can test the entire project. You can upload a
 new image to the corresponding source/ directory in the Bucket in OSS console,
 and you find a new resized image of the same name in the processed/ directory.
 
-2.4 Java For Function Compute
------------------------------
+### Java For Function Compute
 
 Function Compute currently supports OpenJDK1.8.0(runtime=java8).
 
@@ -145,7 +145,7 @@ For Oss trigger, the InputStream String will be like this below, and you can
 process it by FastJson.
 ```java
 {
-    "events":\[
+    "events":[
         {
             "eventName":"ObjectCreated:PutObject",
             "eventSource":"acs:oss",
@@ -178,7 +178,7 @@ process it by FastJson.
                 "principalId":"262561392693583141"
             }
         }
-    \]
+    ]
 }
 ```
 
@@ -190,24 +190,23 @@ execution results by using the outputStream parameter.
 The dependency of the com.aliyun.fc.runtime package can be referenced in the
 following pom.xml:
 ```java
-1.       <dependencies>
-2.         <dependency>
-3.           <groupId>com.aliyun.fc.runtime</groupId>
-4.           <artifactId>fc-java-core</artifactId>
-5.           <version>1.0.0</version>
-6.         </dependency>
-7.         <dependency>
-8.           <groupId>com.aliyun.oss</groupId>
-9.           <artifactId>aliyun-sdk-oss</artifactId>
-10.        <version>2.6.1</version>
-11.      </dependency>
-12.    </dependencies>
+<dependencies>
+   <dependency>
+      <groupId>com.aliyun.fc.runtime</groupId>
+      <artifactId>fc-java-core</artifactId>
+      <version>1.0.0</version>
+   </dependency>
+   <dependency>
+      <groupId>com.aliyun.oss</groupId>
+      <artifactId>aliyun-sdk-oss</artifactId>
+      <version>2.6.1</version>
+   </dependency>
+</dependencies>
 ```
 In addition to that, you should add maven-assembly-plugin to pom.xml in order to
 run mvn clean package –Dmaven.test.skip to package the dependencies.
 
-2.5 Function Interfaces
------------------------
+### Function Interfaces
 
 When you use the Java programming, a class must be implemented, which must
 implement a pre-defined Function Compute interface. Currently, two pre-defined
@@ -229,24 +228,21 @@ output types, but note that the types must be POJO.
 If you want to see more details you can visit this address:
 <https://www.alibabacloud.com/help/doc-detail/58887.htm>
 
-3 Code Practice
-===============
+## Code Practice
 
-3.1 Code Flow
------------------------
+### Code Flow
 
-![](https://common-source.oss-ap-southeast-1.aliyuncs.com/github/e19638c72ceab9b287c41fdbbe755efd_20181203091857.png)
+![](images/e19638c72ceab9b287c41fdbbe755efd.png)
 
-You can start to learn code by <span style="font-weight: bold; color: rgb(255, 0, 0);">PgFunctionEntry.handleRequest</span>.
+You can start to learn code by **PgFunctionEntry.handleRequest**.
 
 
-3.2 Use JDBC Operate HybridDB for Postgrey
------------------------
+### Use JDBC Operate HybridDB for Postgrey
 
 You can use jdbc operate hybridDB for postgrey, for instance, you can read
 DatabaseUtil class to set up connection. The class tells you how to create
 database pool by druid.The key point is if the table is only for insert, then
-you should assemble batch insert sql like: <span style="color: rgb(255, 0, 0);">insert into tableName(col1,col2….) values(val11,val21….),(val12,val22…),(val13,val23…);</span> if the table will execute
+you should assemble batch insert sql like: **insert into tableName(col1,col2….) values(val11,val21….),(val12,val22…),(val13,val23…);** if the table will execute
 both insert and update, you can use batch upsert, the detail introduce page is:
 
 gp_upsert:<https://github.com/digoal/blog/blob/master/201806/20180604_01.md>
@@ -266,4 +262,8 @@ array['{"_row_id":"cac45724-3e19-47ec-a848-265ad45538a4","originreferenceid":"21
 17:57:34.157"}'::json]);
 ```
 
-The code detail you can read from <span style="font-weight: bold; color: rgb(255, 0, 0);">DbService.java</span>
+The code detail you can read from **DbService.java**
+
+## Support
+
+If you need help, please contact [Zouping](zouping.lxp@alibaba-inc.com).
