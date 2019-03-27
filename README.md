@@ -49,17 +49,15 @@ In this sample, we select the China East 2 (Shanghai) region, set the name of th
 
 - Log on to the [Function Compute console](https://fc.console.aliyun.com/).
 
-- See topic [Service
-    operations](https://www.alibabacloud.com/help/doc-detail/73337.htm) to
+- See topic [Service operations](https://www.alibabacloud.com/help/doc-detail/73337.htm) to
     create a service.
 
-In this example, we select the China East 2 (Shanghai) region, set the service name to **demo**, select the **test-project** log project, select the **test-logstore** Logstore, role operation to Create new role, and system policies to AliyunOSSFullAccess and AliyunLogFullAccess.
+    In this example, we select the China East 2 (Shanghai) region, set the service name to **demo**, select the **test-project** log project, select the **test-logstore** Logstore, role operation to Create new role, and system policies to AliyunOSSFullAccess and AliyunLogFullAccess.
 
-- See topic [Function
-    operations](https://www.alibabacloud.com/help/doc-detail/73338.htm) to
+- See topic [Function operations](https://www.alibabacloud.com/help/doc-detail/73338.htm) to
     create a function.
 
-In this example, we select the **Empty Function** template, create no triggers, set the function name to **resize**, runtime environment to **Python**, and leave other parameters to their default values.
+    In this example, we select the **Empty Function** template, create no triggers, set the function name to **resize**, runtime environment to **Python**, and leave other parameters to their default values.
 
 - Edit your function code.
 
@@ -119,7 +117,7 @@ public class PgFunctionEntry implements StreamRequestHandler {
 ```
 -   Package name/Class name
 
-A package and a class can have random names, but their names must correspond to
+    A package and a class can have random names, but their names must correspond to
 the “handler” field of the created function. In the previous example, the
 package name is “example” and the class name is “HelloFC”. Therefore, the
 handler specified during function creation is example.HelloFC::handleRequest.
@@ -127,7 +125,7 @@ The format of “handler” is {package}.{class}::{method}.
 
 -   Implement Interface
 
-The pre-defined Function Compute interface must be implemented in your code. In
+    The pre-defined Function Compute interface must be implemented in your code. In
 the previous example, StreamRequestHandler is implemented, inputStream is the
 data imported when the function is called, and outputStream is used to return
 the function execution result. For more information about the function
@@ -135,13 +133,13 @@ interfaces, see **Function Interfaces**.
 
 -   Context Parameter
 
-The context parameter contains the operation information of the function (such
+    The context parameter contains the operation information of the function (such
 as the request ID and temporary AccessKey). The parameter type
 is com.aliyun.fc.runtime.Context.
 
 -   InputStream
 
-For Oss trigger, the InputStream String will be like this below, and you can
+    For Oss trigger, the InputStream String will be like this below, and you can
 process it by FastJson.
 ```java
 {
@@ -184,10 +182,10 @@ process it by FastJson.
 
 -   Return value
 
-The function that implements the StreamRequestHandler interface returns
+    The function that implements the StreamRequestHandler interface returns
 execution results by using the outputStream parameter.
 
-The dependency of the com.aliyun.fc.runtime package can be referenced in the
+    The dependency of the com.aliyun.fc.runtime package can be referenced in the
 following pom.xml:
 ```java
 <dependencies>
@@ -214,7 +212,7 @@ interfaces can be implemented:
 
 -   StreamRequestHandler
 
-This interface uses the stream request handler to receive the information
+    This interface uses the stream request handler to receive the information
 (events) input when calling a function and return execution results. You need to
 read the input information from inputStream and to write the function execution
 result into outputStream after the read operation is completed. The first
@@ -222,7 +220,7 @@ example in this document uses this interface.
 
 -   PojoRequestHandler<I,O\>
 
-This interface uses the generic method to allow you to customize the input and
+    This interface uses the generic method to allow you to customize the input and
 output types, but note that the types must be POJO.
 
 If you want to see more details you can visit this address:
